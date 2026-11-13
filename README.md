@@ -103,9 +103,9 @@ their authors:
 - **[delegate-skills](https://github.com/amElnagdy/delegate-skills)** and the
   **addy-agent-skills** set — delegation and quality-gate skills.
 - **tasteskill 2.5.1** (`design-taste-frontend`) — the anti-slop frontend
-  discipline behind `taste-skill`: house rules, page plans, section library and
-  the browser finish gate. Only its text core is vendored; see
-  `skills-inventory/taste.md`.
+  discipline behind `design-language` and `design-review`: house rules, page plans,
+  the one-system rules and a finish gate. Re-expressed as factory skills, not
+  vendored; see `skills-inventory/design.md`.
 
 Built with [opencode](https://opencode.ai) and the
 [Model Context Protocol SDK](https://github.com/modelcontextprotocol). See

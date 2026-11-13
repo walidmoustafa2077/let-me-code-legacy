@@ -28,3 +28,4 @@
 | npx | GitHub-distributable packaging and `init-factory` bootstrapper | e564f4d, d5fb2fd |
 | v0.2 | Hermetic delegation tests, ten-tool constraints rewrite, dependency modernization, CI matrix | (this change) |
 | v0.2 | `taste-skill` vendored as text core and wired into `visualizer` + `ui-engineer` | (this change) |
+| v0.2 | Design method absorbed into `design-language` + `design-review`; vendored tree and asset link removed | (this change) |
