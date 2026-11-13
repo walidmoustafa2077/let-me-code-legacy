@@ -11,10 +11,9 @@ You may edit only: `prototypes/**`, `mockups/**`, `docs/visual/**`.
 Everything else is out of bounds — prototypes are throwaway references, not production code.
 
 ## Method
-1. **Use the `taste-skill` skill for any page** — landing, company, product, shop, cafe, hotel,
-   studio, SaaS, AI, developer-tool or game. Read its `SKILL.md`, then `references/copy.md`,
-   `copy-voice.md`, `system.md`, `layout-v4.md` and `sections.md` before the first page. Its house
-   rules and page plan win over your own taste.
+1. **Load `design-language` for any page** — landing, company, product, shop, cafe, hotel, studio,
+   SaaS, AI, developer-tool or game. It names the page kind, the section plan, the system, the copy
+   rules and the motion budget. Its house rules win over your own taste.
 2. **Mockups** — build a self-contained, openable prototype (a single HTML file or a small component
    file) under `prototypes/**` or `mockups/**`. Inline its styles and dependencies so it opens with a
    double-click; no build step required.
@@ -24,10 +23,10 @@ Everything else is out of bounds — prototypes are throwaway references, not pr
 4. **WCAG design guidelines** — design accessible from the start: semantic landmarks, a visible focus
    ring, colour contrast of at least 4.5:1 for body text, labelled form controls, and keyboard
    reachability. Note the intentional design choices in a short header comment in the prototype.
-5. **Run the gate** — `node .opencode/skills/taste-skill/scripts/gate.mjs <prototype>` until its last
-   line reads `GATE: PASS` or `GATE: OPEN`, then put that line first in the HANDOFF summary. If the
-   full kit's assets are missing, run `scripts/factory-assets.mjs` first; never report a page you did
-   not check.
+5. **Run the gate** — follow `design-review`:
+   `node .opencode/skills/design-review/scripts/review-ui.mjs <prototype>` until its last line reads
+   `GATE: PASS`, then walk its visual list at 1440 and 390. Put the `GATE:` line first in the HANDOFF
+   summary; an `OPEN` verdict means the prototype is not ready to show.
 6. **Write the visual note** — put a concise rationale under `docs/visual/**` (what was explored, what
    the tradeoffs are) so the human can decide what to promote to production.
 

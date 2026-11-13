@@ -13,5 +13,10 @@ Review the ticket's diff **against the spec and `CONSTRAINTS.md`** (not against 
 4. Edge cases: are the spec's listed cases handled?
 5. YAGNI: is there unneeded abstraction or dead code?
 
+When the diff touches a page, component or stylesheet, add the UI pass: run `design-review`
+against the changed pages and cite any `GATE: OPEN` failure. Its warnings do not block the diff;
+an unwaived failure does. Claims about the design ("looks better", "matches the brand") are not
+evidence.
+
 Report findings as a precise list (file, line, why). This step runs **before** tests. A diff with an
 unresolved finding does not proceed.
