@@ -40,6 +40,5 @@
     "junior-dev": {
       "allowCustom": true
     }
-  },
-  "defaultModel": "gemini-proxy/flash"
+  }
 }

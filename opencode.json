@@ -12,7 +12,6 @@
   },
   "agent": {
     "general": {
-      "model": "ollama/deepseek-v4.1-flash:cloud",
       "permission": { "ctx_*": "deny" }
     },
     "orchestrator": {
@@ -69,7 +68,7 @@
         "ctx_*": "deny",
         "webfetch": "allow",
         "delegation_*": "allow",
-        "skill": { "core-implementer": "allow", "delegate-task": "allow", "source-grounding": "allow", "incremental-implementation": "allow", "apply-design": "allow", "debugging-and-error-recovery": "allow", "performance": "allow", "ui-engineer": "allow", "refactoring-and-simplification": "allow", "mentorship": "allow", "*": "deny" }
+        "skill": { "core-implementer": "allow", "delegate-task": "allow", "source-grounding": "allow", "incremental-implementation": "allow", "apply-design": "allow", "debugging-and-error-recovery": "allow", "performance": "allow", "ui-engineer": "allow", "design-language": "allow", "design-review": "allow", "refactoring-and-simplification": "allow", "mentorship": "allow", "*": "deny" }
       }
     },
     "junior-dev": {
@@ -106,7 +105,7 @@
         "ctx_*": "deny",
         "webfetch": "deny",
         "delegation_*": "deny",
-        "skill": { "test-driven-development": "allow", "security-hardening": "allow", "code-review-and-quality": "allow", "root-cause-debugging": "allow", "review-protocol": "allow", "verification": "allow", "e2e-and-browser-testing": "allow", "*": "deny" }
+        "skill": { "test-driven-development": "allow", "security-hardening": "allow", "code-review-and-quality": "allow", "design-review": "allow", "root-cause-debugging": "allow", "review-protocol": "allow", "verification": "allow", "e2e-and-browser-testing": "allow", "*": "deny" }
       }
     },
     "git-agent": {
