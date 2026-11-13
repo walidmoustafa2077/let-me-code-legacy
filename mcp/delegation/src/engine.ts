@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { connect } from "node:net";
@@ -124,11 +125,17 @@ export async function waitForHealth(
 
 /** Spawn a detached `opencode serve --port <port>` in the project root. */
 export function spawnEngine(root: string, port: number, command = "opencode"): number | undefined {
+  // A v2 server announces its generated password on stdout, which a detached spawn
+  // discards. Give it a password we already know so the client can authenticate.
+  if (!process.env.OPENCODE_SERVER_PASSWORD) {
+    process.env.OPENCODE_SERVER_PASSWORD = randomBytes(18).toString("base64url");
+  }
   const child = spawn(command, ["serve", "--port", String(port)], {
     cwd: root,
     detached: true,
     // "ignore" avoids the WriteStream drain-listener leak of redirected stdio.
     stdio: "ignore",
+    env: { ...process.env },
     shell: process.platform === "win32",
   });
   child.unref();
