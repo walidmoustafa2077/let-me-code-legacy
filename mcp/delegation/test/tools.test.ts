@@ -9,6 +9,11 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer, listToolNames } from "../src/index.ts";
 
+// Keep the test hermetic: ignore any DELEGATION_ROOT / DELEGATION_SERVER_URL
+// exported by the developer's shell.
+delete process.env.DELEGATION_ROOT;
+delete process.env.DELEGATION_SERVER_URL;
+
 const TEN_TOOLS = [
   "delegate_task",
   "delegate_parallel",

@@ -46,12 +46,17 @@ function parallelClient(repoRoot: string): {
     if (u.endsWith("/session")) return json({ id: "ses_parallel" });
     if (u.endsWith("/message")) {
       const marker = ((init?.body as string) ?? "").includes("ALPHA") ? "alpha" : "beta";
+      // Tasks 0 and 1 map to worktrees suffixed -0- and -1-; each task only
+      // touches its own worktree. Writing both artifacts into every worktree
+      // would race the other task's baseline snapshot and make changed_files
+      // depend on scheduling order.
+      const index = marker === "alpha" ? "0" : "1";
       const wtRoot = join(repoRoot, ".worktrees");
       const dirs = existsSync(wtRoot) ? readdirSync(wtRoot) : [];
       for (const d of dirs) {
         const m = d.match(/^par-\d+-(\d+)-/);
-        if (!m) continue;
-        writeFileSync(join(wtRoot, d, `${m[1] === "0" ? "alpha" : "beta"}.txt`), `${marker}\n`);
+        if (!m || m[1] !== index) continue;
+        writeFileSync(join(wtRoot, d, `${marker}.txt`), `${marker}\n`);
       }
 
       arrivals += 1;

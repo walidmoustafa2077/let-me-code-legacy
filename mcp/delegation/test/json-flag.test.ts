@@ -8,6 +8,11 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer as createMcpServer } from "../src/index.ts";
 
+// Keep the test hermetic: ignore any DELEGATION_ROOT / DELEGATION_SERVER_URL
+// exported by the developer's shell.
+delete process.env.DELEGATION_ROOT;
+delete process.env.DELEGATION_SERVER_URL;
+
 const DIAG = ["host", "port", "port_open", "engine_lock", "lock_alive", "auto_start"];
 const ORDER = ["server_up", "version", "agent_roster", "serverUrl", "allowedAgents", ...DIAG];
 const ORDER_NO_VERSION = ["server_up", "agent_roster", "serverUrl", "allowedAgents", ...DIAG];

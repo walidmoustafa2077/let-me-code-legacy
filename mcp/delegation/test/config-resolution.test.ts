@@ -9,6 +9,11 @@ import {
   type LoadOptions,
 } from "../src/config.ts";
 
+// Tests own their config layers. A developer shell that exports these would
+// otherwise force every temp-project test onto a real project root.
+delete process.env.DELEGATION_ROOT;
+delete process.env.DELEGATION_SERVER_URL;
+
 function tmp(prefix: string): string {
   return mkdtempSync(join(tmpdir(), prefix));
 }
