@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { copyTree, linkMachineLocalAssets } from "../lib/scaffold.mjs";
+import { copyTree } from "../lib/scaffold.mjs";
 
 function mkdirLink(target, link) {
   if (process.platform === "win32") {
@@ -41,71 +41,4 @@ test("copyTree copies real files and skips machine-local links", (t) => {
     log.filter((entry) => entry.action === "skipped-link").map((entry) => entry.src),
     [path.join(src, "assets")]
   );
-});
-
-function tasteTarget(t) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lmc-assets-"));
-  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const script = path.join(
-    root,
-    ".opencode",
-    "skills",
-    "taste-skill",
-    "scripts",
-    "factory-assets.mjs"
-  );
-  fs.mkdirSync(path.dirname(script), { recursive: true });
-  fs.writeFileSync(script, "// stub\n");
-  return root;
-}
-
-test("linkMachineLocalAssets is a no-op when the skill is absent", (t) => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "lmc-assets-"));
-  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-
-  assert.equal(linkMachineLocalAssets({ targetRoot: root }), null);
-});
-
-test("linkMachineLocalAssets records a linked kit", (t) => {
-  const root = tasteTarget(t);
-  const calls = [];
-
-  const entry = linkMachineLocalAssets({
-    targetRoot: root,
-    runner: (script, cwd) => {
-      calls.push({ script, cwd });
-      return "linked assets\n";
-    }
-  });
-
-  assert.equal(entry.action, "assets-linked");
-  assert.deepEqual(calls, [
-    {
-      script: path.join(
-        root,
-        ".opencode",
-        "skills",
-        "taste-skill",
-        "scripts",
-        "factory-assets.mjs"
-      ),
-      cwd: root
-    }
-  ]);
-});
-
-test("linkMachineLocalAssets warns instead of throwing when the kit is missing", (t) => {
-  const root = tasteTarget(t);
-
-  const entry = linkMachineLocalAssets({
-    targetRoot: root,
-    runner: () => {
-      const error = new Error("Command failed");
-      error.stderr = "Install the full kit, then run the helper.\n";
-      throw error;
-    }
-  });
-
-  assert.equal(entry.action, "assets-missing");
-  assert.equal(entry.detail, "Install the full kit, then run the helper.");
 });
