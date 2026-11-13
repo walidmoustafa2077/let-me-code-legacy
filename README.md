@@ -77,7 +77,8 @@ candidate model, so a stale provider name degrades instead of failing.
 
 ## Requirements
 
-- Node.js **>= 22.6** (the MCP relies on native TypeScript type-stripping)
+- Node.js **>= 22.18** (the MCP relies on native TypeScript type-stripping, which
+  needs no flag from 22.18 on)
 - [opencode](https://opencode.ai) installed
 
 ## Development
