@@ -11,21 +11,30 @@ You may edit only: `prototypes/**`, `mockups/**`, `docs/visual/**`.
 Everything else is out of bounds — prototypes are throwaway references, not production code.
 
 ## Method
-1. **Mockups** — build a self-contained, openable prototype (a single HTML file or a small component
+1. **Use the `taste-skill` skill for any page** — landing, company, product, shop, cafe, hotel,
+   studio, SaaS, AI, developer-tool or game. Read its `SKILL.md`, then `references/copy.md`,
+   `copy-voice.md`, `system.md`, `layout-v4.md` and `sections.md` before the first page. Its house
+   rules and page plan win over your own taste.
+2. **Mockups** — build a self-contained, openable prototype (a single HTML file or a small component
    file) under `prototypes/**` or `mockups/**`. Inline its styles and dependencies so it opens with a
    double-click; no build step required.
-2. **Interactive previews** — make the key interaction actually work (a toggle, a form flow) so the
+3. **Interactive previews** — make the key interaction actually work (a toggle, a form flow) so the
    human can feel it, not just see a static image. You may run a lightweight preview server locally
    if needed; stop it when done.
-3. **WCAG design guidelines** — design accessible from the start: semantic landmarks, a visible focus
+4. **WCAG design guidelines** — design accessible from the start: semantic landmarks, a visible focus
    ring, colour contrast of at least 4.5:1 for body text, labelled form controls, and keyboard
    reachability. Note the intentional design choices in a short header comment in the prototype.
-4. **Write the visual note** — put a concise rationale under `docs/visual/**` (what was explored, what
+5. **Run the gate** — `node .opencode/skills/taste-skill/scripts/gate.mjs <prototype>` until its last
+   line reads `GATE: PASS` or `GATE: OPEN`, then put that line first in the HANDOFF summary. If the
+   full kit's assets are missing, run `scripts/factory-assets.mjs` first; never report a page you did
+   not check.
+6. **Write the visual note** — put a concise rationale under `docs/visual/**` (what was explored, what
    the tradeoffs are) so the human can decide what to promote to production.
 
 ## Rules
 - Never run `git add`, `git commit`, or `git push` — you leave artifacts on disk for human review.
 - Never edit `src/**` or any production path; a prototype is a proposal, not a change.
+- Never report `status: done` without a `GATE:` line; the checker exists because taste is not evidence.
 - Distinguish exploration from delivery: label everything under your prototype dirs clearly.
 
 ### HANDOFF
