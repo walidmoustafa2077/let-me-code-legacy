@@ -104,7 +104,6 @@ export async function delegateTask(
   }
 
   const baseline = await statusPorcelain(root);
-  const sessionId = await client.createSession(`job:${args.agent}`);
   const prompt = buildPrompt(args.prompt, args.contextFiles ?? []);
   const { candidates } = resolveModels(cfg, args.agent, args.model);
 
@@ -112,11 +111,18 @@ export async function delegateTask(
   const attempts = candidates.length ? candidates : [undefined];
   const attemptErrors: string[] = [];
   let result: MessageResult | undefined;
+  // v2 fixes agent and model on the session itself, so a retried candidate needs its
+  // own session. v1 ignores the extra options and creates one session per attempt.
+  let sessionId: string | undefined;
 
   for (let i = 0; i < attempts.length; i++) {
     const model = attempts[i];
     const label = model ? `${model.providerID}/${model.modelID}` : "default";
     try {
+      sessionId = await client.createSession(`job:${args.agent}`, {
+        agent: args.agent,
+        ...(model ? { model } : {}),
+      });
       const r = await client.postMessage(sessionId, {
         agent: args.agent,
         ...(model ? { model } : {}),
@@ -138,7 +144,7 @@ export async function delegateTask(
     }
   }
 
-  if (!result) {
+  if (!result || !sessionId) {
     throw new Error(`no model candidates available (${attemptErrors.join(" | ") || "none configured"})`);
   }
 

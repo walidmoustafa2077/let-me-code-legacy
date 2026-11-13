@@ -25,6 +25,33 @@ export interface OpenCodeClientOptions {
   ensure?: () => Promise<void>;
 }
 
+/** Wire protocol spoken by the configured server. opencode v1 and v2 differ. */
+export type ApiMode = "v1" | "v2";
+
+export interface SessionOptions {
+  agent?: string;
+  model?: ModelRef;
+}
+
+interface V2Part {
+  type?: string;
+  text?: string;
+}
+
+interface V2Message {
+  type?: string;
+  time?: { created?: number; completed?: number };
+  content?: V2Part[];
+  outcome?: string;
+  error?: unknown;
+}
+
+interface V2Messages {
+  data?: V2Message[];
+}
+
+const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
 export function authHeaders(): Record<string, string> {
   const password = process.env.OPENCODE_SERVER_PASSWORD;
   if (!password) return {};
@@ -55,6 +82,7 @@ export class OpenCodeClient {
   private autoStart: boolean;
   private ensureOverride?: () => Promise<void>;
   private ensuring = false;
+  private mode?: ApiMode;
 
   constructor(cfg: DelegateConfig, fetchImpl?: typeof fetch, options: OpenCodeClientOptions = {}) {
     this.cfg = cfg;
@@ -107,10 +135,41 @@ export class OpenCodeClient {
     }
   }
 
+  /**
+   * Run the v1 call first and fall back to the v2 surface only when v1 fails and the
+   * server proves it is v2 by answering `/api/info` with a version. A v2 server serves
+   * the web app for every unknown path, so a 200/HTML answer is not proof of anything.
+   */
+  private async call<T>(v1: () => Promise<T>, v2: () => Promise<T>): Promise<T> {
+    if (this.mode === "v1") return v1();
+    if (this.mode === "v2") return v2();
+    try {
+      return await v1();
+    } catch (err) {
+      if (isNetworkError(err) || !(await this.isV2())) throw err;
+      this.mode = "v2";
+      return v2();
+    }
+  }
+
+  private async isV2(): Promise<boolean> {
+    try {
+      const info = await this.raw<{ version?: unknown }>(
+        "/api/info",
+        { method: "GET" },
+        this.cfg.timeouts.healthMs,
+      );
+      return typeof info?.version === "string";
+    } catch {
+      return false;
+    }
+  }
+
   /** Start the configured engine in the project root if it is not already healthy. */
   async ensureServer(): Promise<void> {
     if (this.ensureOverride) return this.ensureOverride();
     await ensureEngine(this.root, this.cfg, () => this.checkHealth());
+    this.mode = undefined;
   }
 
   /** Pure reachability probe: never auto-starts, never throws. */
@@ -124,32 +183,124 @@ export class OpenCodeClient {
   }
 
   health(): Promise<{ healthy: boolean; version?: string }> {
-    return this.request("/global/health", { method: "GET" }, this.cfg.timeouts.healthMs, false);
+    return this.call(
+      () => this.request("/global/health", { method: "GET" }, this.cfg.timeouts.healthMs, false),
+      async () => {
+        const info = await this.raw<{ version?: string }>(
+          "/api/info",
+          { method: "GET" },
+          this.cfg.timeouts.healthMs,
+        );
+        return { healthy: true, version: info.version };
+      },
+    );
   }
 
   agents(): Promise<Array<{ name: string }>> {
-    return this.request("/agent", { method: "GET" }, this.cfg.timeouts.healthMs);
+    return this.call(
+      () => this.request("/agent", { method: "GET" }, this.cfg.timeouts.healthMs),
+      async () => {
+        const r = await this.request<{ data?: Array<{ id?: string; name?: string }> }>(
+          "/api/agent",
+          { method: "GET" },
+          this.cfg.timeouts.healthMs,
+        );
+        return (r.data ?? []).map((agent) => ({ name: agent.id ?? agent.name ?? "" }));
+      },
+    );
   }
 
-  async createSession(title: string): Promise<string> {
-    const r = await this.request<{ id: string }>("/session", {
-      method: "POST",
-      body: JSON.stringify({ title }),
-    });
-    return r.id;
+  createSession(title: string, options: SessionOptions = {}): Promise<string> {
+    return this.call(
+      async () => {
+        const r = await this.request<{ id: string }>("/session", {
+          method: "POST",
+          body: JSON.stringify({ title }),
+        });
+        return r.id;
+      },
+      async () => {
+        const body: Record<string, unknown> = { title };
+        if (options.agent) body.agent = options.agent;
+        if (options.model) body.model = { providerID: options.model.providerID, id: options.model.modelID };
+        const r = await this.request<{ data?: { id?: string } }>("/api/session", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        const id = r.data?.id;
+        if (!id) throw new Error("createSession failed: the server returned no session id");
+        return id;
+      },
+    );
   }
 
   postMessage(
     id: string,
     body: { agent: string; model?: ModelRef; parts: ChatPart[] },
   ): Promise<MessageResult> {
-    return this.request<MessageResult>(`/session/${id}/message`, {
+    return this.call(
+      () =>
+        this.request<MessageResult>(`/session/${id}/message`, {
+          method: "POST",
+          body: JSON.stringify(body),
+        }),
+      () => this.postMessageV2(id, body),
+    );
+  }
+
+  /** v2 accepts the prompt asynchronously and streams the answer into the session. */
+  private async postMessageV2(
+    id: string,
+    body: { agent: string; model?: ModelRef; parts: ChatPart[] },
+  ): Promise<MessageResult> {
+    const text = body.parts
+      .map((part) => part.text ?? "")
+      .filter((part) => part.length > 0)
+      .join("\n\n");
+    await this.request(`/api/session/${id}/prompt`, {
       method: "POST",
-      body: JSON.stringify(body),
+      body: JSON.stringify({ text, delivery: "queue" }),
     });
+
+    const deadline = Date.now() + this.cfg.timeouts.messageMs;
+    for (;;) {
+      const res = await this.request<V2Messages>(`/api/session/${id}/message`, { method: "GET" });
+      const messages = res.data ?? [];
+      const idle = [...messages].reverse().find((message) => message.type === "idle");
+      if (idle) return this.v2Result(id, messages, idle);
+      if (Date.now() >= deadline) {
+        throw new Error(`timed out after ${this.cfg.timeouts.messageMs}ms waiting for session ${id}`);
+      }
+      await delay(500);
+    }
+  }
+
+  private v2Result(id: string, messages: V2Message[], idle: V2Message): MessageResult {
+    const assistants = messages.filter((message) => message.type === "assistant");
+    const parts: ChatPart[] = [];
+    for (const message of assistants) {
+      for (const part of message.content ?? []) {
+        if (part.type === "text" && typeof part.text === "string" && part.text.length > 0) {
+          parts.push({ type: "text", text: part.text });
+        }
+      }
+    }
+    const last = assistants[assistants.length - 1];
+    const info: Record<string, unknown> = { ...(last ?? {}), session_id: id };
+    if (idle.outcome && idle.outcome !== "succeeded") info.error = idle.error ?? idle.outcome;
+    if (!assistants.length) info.error = info.error ?? "the session finished without an assistant message";
+    return { info, parts };
   }
 
   abort(id: string): Promise<{ aborted: boolean }> {
-    return this.request(`/session/${id}/abort`, { method: "POST" });
+    return this.call(
+      () => this.request<{ aborted: boolean }>(`/session/${id}/abort`, { method: "POST" }),
+      async () => {
+        const r = await this.request<{ interrupted?: boolean }>(`/api/session/${id}/interrupt`, {
+          method: "POST",
+        });
+        return { aborted: r.interrupted === true };
+      },
+    );
   }
 }
