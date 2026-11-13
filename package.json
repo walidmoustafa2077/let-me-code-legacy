@@ -8,7 +8,7 @@
     "let-me-code": "bin/cli.mjs"
   },
   "engines": {
-    "node": ">=22.6"
+    "node": ">=22.18"
   },
   "files": [
     ".opencode",
