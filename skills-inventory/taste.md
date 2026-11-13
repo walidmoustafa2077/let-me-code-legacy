@@ -34,6 +34,11 @@ The link is gitignored and never committed. When no full kit is installed the
 script exits 1 and the skill treats every asset-dependent step as blocked
 rather than inventing a substitute.
 
+`let-me-code init` runs the helper for you: after copying the factory it links
+the kit into the new project and prints a warning when none is installed, so a
+scaffolded project never carries a dangling path. Run the command above only
+when the kit is installed later.
+
 ## Local changes from upstream
 
 1. Renamed the frontmatter `name` from `design-taste-frontend` to `taste-skill`

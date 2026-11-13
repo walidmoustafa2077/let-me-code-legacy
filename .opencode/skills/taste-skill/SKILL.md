@@ -25,7 +25,8 @@ node <skill>/scripts/factory-assets.mjs --print  # print the resolved assets fol
 It looks at `$TASTE_SKILL_ASSETS`, then `~/.config/opencode/skills/taste-skill/assets`, then
 `~/.claude/skills/design-taste-frontend/assets` and `~/.agents/skills/design-taste-frontend/assets`.
 With none of them it exits non-zero and says how to install the full kit. Never edit the kit's
-files; a step whose asset is missing is blocked, not improvised.
+files; a step whose asset is missing is blocked, not improvised. `let-me-code init` runs this for
+you in the scaffolded project, so the command above is only needed after installing the kit later.
 
 opencode has no skill hooks, so nothing runs the gate for you. The gate is part of the work: run
 `gate.mjs` yourself before reporting `done`, and put its last line (`GATE: PASS`, `OPEN`, `DONE`,
