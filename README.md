@@ -20,6 +20,11 @@ opencode serve --port 4096   # in one terminal
 opencode                     # in another; talk to the Orchestrator
 ```
 
+On opencode v2 the server requires Basic auth: export `OPENCODE_SERVER_PASSWORD` before starting
+both sides (the username is `opencode`, or whatever you set in `OPENCODE_SERVER_USERNAME`). The
+delegation client detects v1 or v2 on its own and speaks whichever API the server exposes; when it
+has to start the server itself it generates a password and hands it to the child process.
+
 ## What it installs
 
 | Path | Purpose |
