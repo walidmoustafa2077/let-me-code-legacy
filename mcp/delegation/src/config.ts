@@ -59,7 +59,7 @@ export function defaultConfig(): DelegateConfig {
     serverUrl: "http://localhost:4096",
     allowCustomModel: true,
     agents: {},
-    timeouts: { healthMs: 5000, messageMs: 900000 },
+    timeouts: { healthMs: 5000, messageMs: 1800000 },
     allowedAgents: [
       "architect",
       "senior-dev",

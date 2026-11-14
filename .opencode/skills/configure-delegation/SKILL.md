@@ -12,7 +12,7 @@ The engine reads `DELEGATE_CONFIG.json` at the repo root:
   "engine": "opencode",
   "serverUrl": "http://localhost:4096",
   "defaultModel": "ollama/deepseek-v4.1-flash:cloud",
-  "timeouts": { "healthMs": 5000, "messageMs": 900000 },
+  "timeouts": { "healthMs": 5000, "messageMs": 1800000 },
   "allowedAgents": ["architect", "senior-dev", "qa-engineer", "general"]
 }
 ```

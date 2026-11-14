@@ -7,7 +7,7 @@
       "command": ["node", "mcp/delegation/src/index.ts"],
       "cwd": ".",
       "enabled": true,
-      "timeout": 1200000
+      "timeout": 2400000
     }
   },
   "agent": {
