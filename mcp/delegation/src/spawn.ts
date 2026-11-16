@@ -4,7 +4,8 @@ import type { DelegateConfig } from "./config.ts";
 import { parseModel, resolveModels } from "./config.ts";
 import { changedSince, diffStat, statusPorcelain } from "./git.ts";
 import { extractText, parseHandoff, type Handoff } from "./handoff.ts";
-import type { MessageResult, OpenCodeClient } from "./http.ts";
+import type { MessageResult, ModelRef, OpenCodeClient } from "./http.ts";
+import { StallError } from "./http.ts";
 import { createWorktree, removeWorktree } from "./worktree.ts";
 
 export interface DelegateArgs {
@@ -22,16 +23,23 @@ export interface DelegateResult {
   changed_files: string[];
   diff_stat: string;
   session_id: string;
-  log_path: string;
+  log_path: string | null;
+  /** True when the child was killed for making no progress — a different failure from "failed". */
+  stalled?: boolean;
 }
 
 const HANDOFF_INSTRUCTION = [
+  "",
+  "Before your first action: load the skill your instructions name, using the `skill` tool.",
+  "If the instructions name no skill, load the one that governs the job you were given.",
+  "Working from memory is a failure, even when the output looks right.",
   "",
   "When you have finished, you MUST end your reply with exactly this block:",
   "### HANDOFF",
   "status: done | blocked | needs-input",
   "summary: <one paragraph>",
   "artifacts: <paths created/modified>",
+  "skills: <comma-separated skills you actually loaded with the skill tool>",
   "next: <what the orchestrator should do>",
 ].join("\n");
 
@@ -108,12 +116,14 @@ export async function delegateTask(
   const { candidates } = resolveModels(cfg, args.agent, args.model);
 
   const parts = [{ type: "text", text: prompt }];
-  const attempts = candidates.length ? candidates : [undefined];
+  const attempts: (ModelRef | undefined)[] = candidates.length ? candidates : [undefined];
   const attemptErrors: string[] = [];
   let result: MessageResult | undefined;
   // v2 fixes agent and model on the session itself, so a retried candidate needs its
   // own session. v1 ignores the extra options and creates one session per attempt.
   let sessionId: string | undefined;
+  /** One fresh-session retry after a stall, then a hard blocked. Never a third attempt. */
+  let stallRetries = 0;
 
   for (let i = 0; i < attempts.length; i++) {
     const model = attempts[i];
@@ -135,6 +145,35 @@ export async function delegateTask(
       if (infoError && isRetryableModelError(infoError) && i < attempts.length - 1) continue;
       break;
     } catch (err) {
+      // A stall is not a model failure: retry once in a fresh session, then give up loudly
+      // instead of letting the orchestrator sit on it.
+      if (err instanceof StallError) {
+        await writeLog(root, args.agent, err.sessionId, {
+          args,
+          baseline,
+          stalled: err.message,
+        }).catch(() => null);
+        attemptErrors.push(`${label}: stalled after ${Math.round(err.stalledMs / 1000)}s`);
+        if (stallRetries < 1) {
+          stallRetries += 1;
+          attempts.push(model);
+          continue;
+        }
+        return {
+          status: "blocked",
+          stalled: true,
+          summary:
+            `Child "${args.agent}" produced no output for ${Math.round(err.stalledMs / 1000)}s ` +
+            `twice in a row and was aborted both times. Nothing was committed. The ticket did ` +
+            `not progress — do not dispatch a third attempt without changing the prompt or ` +
+            `splitting the ticket.`,
+          handoff: null,
+          changed_files: await changedSince(root, baseline),
+          diff_stat: await diffStat(root),
+          session_id: err.sessionId,
+          log_path: null,
+        };
+      }
       attemptErrors.push(`${label}: ${(err as Error).message}`);
       if (i < attempts.length - 1 && isRetryableModelError(err)) continue;
       if (attemptErrors.length > 1) {

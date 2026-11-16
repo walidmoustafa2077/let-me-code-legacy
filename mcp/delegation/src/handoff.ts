@@ -5,6 +5,8 @@ export interface Handoff {
   summary: string;
   artifacts: string;
   next: string;
+  /** Skills the child actually loaded with the `skill` tool. Empty means it worked from memory. */
+  skills: string;
 }
 
 const STATUSES: HandoffStatus[] = ["done", "blocked", "needs-input"];
@@ -25,6 +27,7 @@ export function parseHandoff(text: string): Handoff | null {
     summary: field("summary"),
     artifacts: field("artifacts"),
     next: field("next"),
+    skills: field("skills"),
   };
 }
 

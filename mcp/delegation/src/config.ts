@@ -5,6 +5,12 @@ import { dirname, join, resolve } from "node:path";
 export interface Timeouts {
   healthMs: number;
   messageMs: number;
+  /**
+   * How long a child session may make no visible progress before it is considered
+   * wedged, aborted, and reported as stalled. Guards against a hung model burning
+   * the whole messageMs budget for nothing.
+   */
+  stallMs: number;
 }
 
 export interface AgentModelConfig {
@@ -59,7 +65,7 @@ export function defaultConfig(): DelegateConfig {
     serverUrl: "http://localhost:4096",
     allowCustomModel: true,
     agents: {},
-    timeouts: { healthMs: 5000, messageMs: 1800000 },
+    timeouts: { healthMs: 5000, messageMs: 1800000, stallMs: 180000 },
     allowedAgents: [
       "architect",
       "senior-dev",
@@ -220,6 +226,9 @@ export function validateConfig(raw: unknown, path: string): Partial<DelegateConf
     }
     if ("messageMs" in tt && typeof tt.messageMs !== "number") {
       throw new Error(`${path}: "timeouts.messageMs" must be a number`);
+    }
+    if ("stallMs" in tt && typeof tt.stallMs !== "number") {
+      throw new Error(`${path}: "timeouts.stallMs" must be a number`);
     }
   }
   if ("allowedAgents" in o) {

@@ -3,7 +3,8 @@
   "serverUrl": "http://localhost:4096",
   "timeouts": {
     "healthMs": 5000,
-    "messageMs": 1800000
+    "messageMs": 1800000,
+    "stallMs": 180000
   },
   "allowCustomModel": true,
   "agents": {

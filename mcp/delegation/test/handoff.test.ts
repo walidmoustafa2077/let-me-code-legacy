@@ -34,6 +34,15 @@ test("parseHandoff rejects an unknown status", () => {
   assert.equal(parseHandoff(GOOD.replace("status: done", "status: maybe")), null);
 });
 
+test("parseHandoff reports an empty skills field when the child loaded none", () => {
+  assert.equal(parseHandoff(GOOD)?.skills, "");
+  const withSkills = GOOD.replace(
+    "next:",
+    "skills: intent-extractor, writing-plans\nnext:",
+  );
+  assert.equal(parseHandoff(withSkills)?.skills, "intent-extractor, writing-plans");
+});
+
 test("extractText concatenates only text parts", () => {
   const parts = [
     { type: "step-start" },

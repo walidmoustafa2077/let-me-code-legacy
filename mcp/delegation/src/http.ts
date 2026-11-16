@@ -52,6 +52,37 @@ interface V2Messages {
 
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+/**
+ * A child session that stopped making visible progress. Thrown instead of waiting out the
+ * whole messageMs budget, so a wedged model costs two minutes and not thirty.
+ */
+export class StallError extends Error {
+  readonly sessionId: string;
+  readonly stalledMs: number;
+  readonly lastActivity: string;
+
+  constructor(sessionId: string, stalledMs: number, lastActivity: string) {
+    super(
+      `session ${sessionId} stalled: no progress for ${Math.round(stalledMs / 1000)}s ` +
+        `(last activity: ${lastActivity})`,
+    );
+    this.name = "StallError";
+    this.sessionId = sessionId;
+    this.stalledMs = stalledMs;
+    this.lastActivity = lastActivity;
+  }
+}
+
+/** Cheap progress signal: message count, last type, text content hash, completion time. */
+function fingerprintOf(messages: V2Message[]): string {
+  const last = messages[messages.length - 1];
+  if (!last) return "0:-";
+  const text = (last.content ?? []).map((part) => part.text ?? "").join("");
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) hash = (hash * 31 + text.charCodeAt(i)) | 0;
+  return `${messages.length}:${last.type ?? "-"}:${text.length}:${hash}:${last.time?.completed ?? 0}`;
+}
+
 export function authHeaders(): Record<string, string> {
   const password = process.env.OPENCODE_SERVER_PASSWORD;
   if (!password) return {};
@@ -262,15 +293,46 @@ export class OpenCodeClient {
       body: JSON.stringify({ text, delivery: "queue" }),
     });
 
+    const stallMs = this.cfg.timeouts.stallMs;
     const deadline = Date.now() + this.cfg.timeouts.messageMs;
+    let fingerprint = "";
+    let lastProgress = Date.now();
+
     for (;;) {
-      const res = await this.request<V2Messages>(`/api/session/${id}/message`, { method: "GET" });
+      // A dead server must not eat the stall budget, so the poll GET gets its own short timeout.
+      const res = await this.request<V2Messages>(
+        `/api/session/${id}/message`,
+        { method: "GET" },
+        Math.min(15_000, stallMs),
+      );
       const messages = res.data ?? [];
       const idle = [...messages].reverse().find((message) => message.type === "idle");
       if (idle) return this.v2Result(id, messages, idle);
-      if (Date.now() >= deadline) {
-        throw new Error(`timed out after ${this.cfg.timeouts.messageMs}ms waiting for session ${id}`);
+
+      const next = fingerprintOf(messages);
+      if (next !== fingerprint) {
+        fingerprint = next;
+        lastProgress = Date.now();
       }
+
+      const quiet = Date.now() - lastProgress;
+      if (quiet >= stallMs) {
+        const last = messages[messages.length - 1];
+        const detail = last
+          ? `${last.type ?? "unknown"} message, ${messages.length} total`
+          : "no messages at all";
+        // Abort before throwing so the wedged session does not keep burning tokens.
+        await this.abort(id).catch(() => ({ aborted: false }));
+        throw new StallError(id, quiet, detail);
+      }
+
+      if (Date.now() >= deadline) {
+        throw new Error(
+          `timed out after ${this.cfg.timeouts.messageMs}ms waiting for session ${id} ` +
+            `(last progress ${Math.round(quiet / 1000)}s ago)`,
+        );
+      }
+
       await delay(500);
     }
   }
