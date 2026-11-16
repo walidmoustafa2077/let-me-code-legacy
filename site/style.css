@@ -182,8 +182,12 @@ code {
 .flow li {
   counter-increment: step;
   display: grid;
-  grid-template-columns: 2.6rem 1fr;
-  gap: 1rem;
+  /* Three grid items live here: the ::before counter, the title, the body.
+     Pin the counter to column 1 across both rows so the text never falls
+     back into the narrow number column. */
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0;
   padding: 1rem 0;
   border-top: 1px solid var(--rule);
   font-size: .98rem;
@@ -195,14 +199,17 @@ code {
   font-size: .75rem;
   color: var(--accent);
   padding-top: .35rem;
+  grid-row: 1 / span 2;
+  grid-column: 1;
 }
 .flow .k {
   display: block;
   font-weight: 600;
   letter-spacing: -.01em;
   margin-bottom: .15rem;
+  grid-column: 2;
 }
-.flow li span:last-child { color: var(--ink-soft); }
+.flow li span:last-child { grid-column: 2; color: var(--ink-soft); }
 
 /* ---------- roster ---------- */
 
@@ -270,7 +277,7 @@ footer a:hover { color: var(--accent); }
 @media (max-width: 480px) {
   body { font-size: 16px; }
   .roster div { grid-template-columns: 1fr; gap: .2rem; }
-  .flow li { grid-template-columns: 2rem 1fr; gap: .7rem; }
+  .flow li { grid-template-columns: 2rem minmax(0, 1fr); column-gap: .7rem; row-gap: 0; }
   footer { flex-direction: column; gap: .4rem; }
 }
 
