@@ -38,10 +38,34 @@ has to start the server itself it generates a password and hands it to the child
 | Path | Purpose |
 | --- | --- |
 | `.opencode/agent/*` | The subagent roster |
-| `.opencode/skills/*` | The skill library |
+| `.opencode/skills/*` | The skill library — 85 skills, see `skills-inventory/SKILLS.md` |
 | `mcp/delegation/` | The delegation MCP server (TypeScript, run directly by Node) |
 | `opencode.json` | MCP + agent wiring (merged into yours, never clobbered) |
 | `DELEGATE_CONFIG.json` | Engine, server URL, timeouts, allowed agents |
+
+## How a run goes
+
+The orchestrator is the only agent you talk to, and it stops for you twice before any code exists.
+
+```
+ROUTE → INTERVIEW → INTENT → SPEC → [SPEC GATE: you approve] → TICKETS → [BUILD GATE: you approve]
+      → POPULATE → EXECUTE → QUALITY → LAND → CLOSE
+```
+
+- **Interview** — one question per turn, until problem, scope, stack, data, privacy, interface,
+  look and done-criteria are all answered. There is no upper limit on questions.
+- **Two gates** — the spec and the ticket list are both shown to you, and nothing is built,
+  committed, or dispatched until you say yes. Silence is not approval.
+- **Skills are not optional** — every agent opens by loading the skill that governs its job and
+  reports the list in the `skills:` line of its handoff. An agent that reports none is
+  re-dispatched instead of trusted.
+- **No silent waits** — a child that produces nothing for `timeouts.stallMs` (3 minutes) is
+  aborted, logged, and retried once in a fresh session. A second stall blocks the ticket and
+  tells you what was tried.
+
+Scaffolding copies `.opencode` as-is, so a new project receives all 85 skills (~37 MB, of which
+33 MB is the `taste-skill/assets/` photography and scene library). A project with no UI can
+delete that one folder.
 
 ## CLI
 
@@ -87,6 +111,24 @@ otherwise `allowedAgents` is used. Passing a `model` to `delegate_task` is
 rejected unless the agent (or `allowCustomModel`) allows it. On an
 *unknown-model* error the job retries the same message against the next
 candidate model, so a stale provider name degrades instead of failing.
+
+Timeouts are set in the same file:
+
+```jsonc
+{
+  "timeouts": {
+    "healthMs": 5000,      // how long to wait for the server to answer a health check
+    "messageMs": 1800000,  // hard ceiling for one child message
+    "stallMs": 180000      // no visible progress for this long means the child is wedged
+  }
+}
+```
+
+`stallMs` is the watchdog. The client fingerprints the child's message stream each poll; when the
+fingerprint stops changing for `stallMs`, it interrupts the session, writes a log entry with
+`stalled: true`, and `delegate_task` returns `status: "blocked"` with `stalled: true` after one
+fresh-session retry. Without it a wedged child used to burn the full `messageMs` budget — thirty
+minutes of silence on the default settings.
 
 ## Requirements
 
