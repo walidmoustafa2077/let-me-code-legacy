@@ -73,6 +73,7 @@ delete that one folder.
 let-me-code [init] [target-dir] [options]
 
   -y, --yes           non-interactive; accept safe defaults
+      --upgrade       refresh the factory's own files, backing up each one it replaces
       --force         overwrite conflicts without prompting
       --no-install    skip npm install in mcp/delegation
       --no-test       skip the MCP test run
@@ -83,6 +84,21 @@ let-me-code [init] [target-dir] [options]
 ```
 
 Existing files are never destroyed without a backup (`<name>.bak-<timestamp>`).
+
+### Upgrading a project that already exists
+
+A plain run is additive: it keeps every file the project already has, which means an installed
+factory never receives fixes. To pull factory updates into a live project, run with `--upgrade`:
+
+```bash
+node bin/cli.mjs init ../my-project --upgrade --no-install --no-test
+```
+
+It replaces the factory's own files — `.opencode/agent/*.md`, `.opencode/skills/*`, `mcp/delegation`,
+`DELEGATE_CONFIG.json` — keeps a `.bak-<timestamp>` copy of each file it actually changes, skips
+every byte-identical file, and still *merges* `opencode.json` so project-local settings (such as a
+pinned `DELEGATION_ROOT`) survive. Your own files — `BOARD.md`, `INTENT.md`, `tickets/`, `docs/`,
+source code — are never touched.
 
 ## Model configuration
 
