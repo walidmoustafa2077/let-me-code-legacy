@@ -5,6 +5,14 @@ specialised subagents (architect, senior-dev, qa-engineer, git-agent,
 tech-writer, …), a library of workflow skills, and a delegation MCP server
 that orchestrates them. Bootstrap it into any project with one command.
 
+It fits teams that want AI coding agents with actual separation of duties —
+planning, implementation, review, and commit are different agents with
+different permissions — instead of one chatbot doing all of it.
+
+**[Documentation site](https://walidmoustafa2077.github.io/let-me-code/)** ·
+[Source on GitHub](https://github.com/walidmoustafa2077/let-me-code) ·
+MIT · Node.js 22.18+
+
 ## Quick start
 
 ```bash
