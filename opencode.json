@@ -41,6 +41,7 @@
         "ctx_*": "deny",
         "delegation_*": "allow",
         "skill": {
+          "*": "deny",
           "agent-dispatcher": "allow",
           "async-unblocker": "allow",
           "brainstorming": "allow",
@@ -59,7 +60,6 @@
           "verification": "allow",
           "verification-before-completion": "allow",
           "writing-plans": "allow",
-          "*": "deny",
           "finishing-a-development-branch": "allow"
         }
       }
@@ -90,6 +90,7 @@
         "delegation_*": "deny",
         "delegation_ticket_write": "allow",
         "skill": {
+          "*": "deny",
           "aspnet-core": "allow",
           "brainstorming": "allow",
           "constraint-setter": "allow",
@@ -102,8 +103,7 @@
           "spec-creator": "allow",
           "system-designer": "allow",
           "task-breakdown": "allow",
-          "writing-plans": "allow",
-          "*": "deny"
+          "writing-plans": "allow"
         }
       }
     },
@@ -132,6 +132,7 @@
         "webfetch": "allow",
         "delegation_*": "allow",
         "skill": {
+          "*": "deny",
           "apply-design": "allow",
           "aspnet-core": "allow",
           "avoid-ai-design": "allow",
@@ -144,7 +145,6 @@
           "delegate-task": "allow",
           "design-language": "allow",
           "design-review": "allow",
-          "design-taste-frontend": "allow",
           "dotnet-webapi": "allow",
           "e2e-and-browser-testing": "allow",
           "executing-plans": "allow",
@@ -173,8 +173,8 @@
           "ui-engineer": "allow",
           "using-git-worktrees": "allow",
           "verification-before-completion": "allow",
-          "*": "deny",
-          "mcp-builder": "allow"
+          "mcp-builder": "allow",
+          "taste-skill": "allow"
         }
       }
     },
@@ -203,14 +203,14 @@
         "ctx_*": "deny",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "apply-design": "allow",
           "core-implementer": "allow",
           "design-language": "allow",
           "incremental-implementation": "allow",
           "source-grounding": "allow",
           "test-driven-development": "allow",
-          "ui-engineer": "allow",
-          "*": "deny"
+          "ui-engineer": "allow"
         }
       }
     },
@@ -238,12 +238,12 @@
         "webfetch": "deny",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "aspnet-core": "allow",
           "avoid-ai-design": "allow",
           "code-review-and-quality": "allow",
           "code-simplifier": "allow",
           "design-review": "allow",
-          "design-taste-frontend": "allow",
           "dotnet-webapi": "allow",
           "e2e-and-browser-testing": "allow",
           "find-bugs": "allow",
@@ -258,8 +258,8 @@
           "test-driven-development": "allow",
           "verification": "allow",
           "verification-before-completion": "allow",
-          "*": "deny",
-          "security-ownership-map": "allow"
+          "security-ownership-map": "allow",
+          "taste-skill": "allow"
         }
       }
     },
@@ -283,10 +283,10 @@
         "webfetch": "deny",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "branch-hygiene": "allow",
           "commit-conventions": "allow",
           "git-workflow": "allow",
-          "*": "deny",
           "git-rewrite-history": "allow"
         }
       }
@@ -313,13 +313,13 @@
         "webfetch": "allow",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "domain-modeling": "allow",
           "doubt-driven-review": "allow",
           "guardrail-audit": "allow",
           "minimalism-enforcer": "allow",
           "security-threat-model": "allow",
-          "writing-plans": "allow",
-          "*": "deny"
+          "writing-plans": "allow"
         }
       }
     },
@@ -345,10 +345,10 @@
         "webfetch": "deny",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "code-simplifier": "allow",
           "minimalism-enforcer": "allow",
-          "refactoring-and-simplification": "allow",
-          "*": "deny"
+          "refactoring-and-simplification": "allow"
         }
       }
     },
@@ -377,14 +377,14 @@
         "webfetch": "allow",
         "delegation_*": "deny",
         "skill": {
+          "*": "deny",
           "agent-skill-author": "allow",
           "domain-modeling": "allow",
           "session-retro": "allow",
           "skill-creator": "allow",
           "strategic-compact": "allow",
           "system-documenter": "allow",
-          "writing-skills": "allow",
-          "*": "deny"
+          "writing-skills": "allow"
         }
       }
     },
@@ -414,12 +414,12 @@
         "delegation_*": "deny",
         "ctx_*": "deny",
         "skill": {
+          "*": "deny",
           "configuring-opentelemetry-dotnet": "allow",
           "security-hardening": "allow",
           "security-threat-model": "allow",
           "systematic-debugging": "allow",
-          "verification": "allow",
-          "*": "deny"
+          "verification": "allow"
         }
       }
     },
@@ -447,18 +447,18 @@
         "delegation_*": "deny",
         "ctx_*": "deny",
         "skill": {
+          "*": "deny",
           "apply-design": "allow",
           "avoid-ai-design": "allow",
           "composition-patterns": "allow",
           "design-language": "allow",
           "design-review": "allow",
-          "design-taste-frontend": "allow",
           "frontend-design": "allow",
           "portfolio-case-study-writer": "allow",
           "portfolio-page": "allow",
           "react-best-practices": "allow",
           "ui-engineer": "allow",
-          "*": "deny"
+          "taste-skill": "allow"
         }
       }
     }
