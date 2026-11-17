@@ -1,21 +1,61 @@
-MIT License
+let-me-code — Commercial License
+Copyright (c) 2026 Walid Mostafa. All rights reserved.
 
-Copyright (c) 2026 Walid Mostafa
+This software, including its source code, agent definitions, skills, prompts,
+documentation and any accompanying files (the "Software"), is proprietary and
+is licensed, not sold, under the terms below. It is NOT open source.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. License grant
+   Upon payment of the applicable fee, you are granted a non-exclusive,
+   non-transferable, non-sublicensable license for one (1) individual developer
+   to:
+   a. install and use the Software on any number of machines that you
+      personally use;
+   b. use the Software in any number of private and commercial projects,
+      including client work and products you sell;
+   c. modify the Software for your own use, and keep those modifications
+      private.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+   Each additional developer who installs or uses the Software requires a
+   separate license.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. Restrictions
+   You may not:
+   a. copy, publish, share, distribute, sublicense, rent, lease or resell the
+      Software, in whole or in part, in source or compiled form;
+   b. make the Software available to any third party, including through a
+      public repository, package registry, hosted service, or bundled product;
+   c. use the Software, or any derivative of it, to create or distribute a
+      competing product, template, boilerplate, course, or agent/skill pack;
+   d. remove or alter this license, copyright notices, or attribution; or
+   e. use the Software to train, fine-tune or otherwise build a machine
+      learning model that reproduces it.
+
+3. Ownership
+   The Software is licensed, not sold. Walid Mostafa retains all right, title
+   and interest in and to the Software, including all intellectual property
+   rights. All rights not expressly granted are reserved.
+
+4. No warranty
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+5. Limitation of liability
+   IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM,
+   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+   OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+   USE OR OTHER DEALINGS IN THE SOFTWARE. IN NO EVENT SHALL TOTAL LIABILITY
+   EXCEED THE AMOUNT YOU PAID FOR THE LICENSE.
+
+6. Termination
+   This license terminates automatically if you breach any of its terms. On
+   termination you must stop using the Software and delete all copies.
+
+7. Prior releases
+   Copies of earlier releases that were distributed under the MIT License
+   remain governed by the MIT License for those copies only. This license
+   applies to this and all subsequent releases.
+
+8. Contact
+   Licensing questions: walidmoustafa2077@gmail.com

@@ -11,7 +11,7 @@ different permissions — instead of one chatbot doing all of it.
 
 **[Documentation site](https://walidmoustafa2077.github.io/let-me-code/)** ·
 [Source on GitHub](https://github.com/walidmoustafa2077/let-me-code) ·
-MIT · Node.js 22.18+
+Commercial license · Node.js 22.18+
 
 ## Quick start
 
@@ -189,4 +189,5 @@ Built with [opencode](https://opencode.ai) and the
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+Commercial, proprietary — see [LICENSE](./LICENSE). One license per developer;
+use in unlimited private and commercial projects, no redistribution or resale.

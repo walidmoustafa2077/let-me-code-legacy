@@ -1,8 +1,8 @@
 {
   "name": "let-me-code",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "An agent factory for opencode: specialised subagents, skills, and a delegation MCP server, bootstrapped with one command.",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "bin": {
     "let-me-code": "bin/cli.mjs"
