@@ -174,7 +174,7 @@
           "using-git-worktrees": "allow",
           "verification-before-completion": "allow",
           "mcp-builder": "allow",
-          "taste-skill": "allow"
+          "design-taste-frontend": "allow"
         }
       }
     },
@@ -259,7 +259,7 @@
           "verification": "allow",
           "verification-before-completion": "allow",
           "security-ownership-map": "allow",
-          "taste-skill": "allow"
+          "design-taste-frontend": "allow"
         }
       }
     },
@@ -458,7 +458,7 @@
           "portfolio-page": "allow",
           "react-best-practices": "allow",
           "ui-engineer": "allow",
-          "taste-skill": "allow"
+          "design-taste-frontend": "allow"
         }
       }
     }
