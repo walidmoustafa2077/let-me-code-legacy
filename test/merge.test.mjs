@@ -33,23 +33,53 @@ test("mergeOpencodeConfig preserves user keys and adds factory agents", () => {
   assert.equal(merged.agent.architect.model, "f");
 });
 
-test("applyModel rewrites only agents that declare a model", () => {
+test("applyModel sets the model on every agent definition", () => {
   const config = {
     agent: {
       a: { model: "old" },
-      b: { description: "no model here" }
+      b: { description: "no model here" },
+      c: "not-an-object"
     }
   };
   const out = applyModel(config, "new/model");
   assert.equal(out.agent.a.model, "new/model");
-  assert.equal("model" in out.agent.b, false);
+  assert.equal(out.agent.b.model, "new/model");
+  assert.equal(out.agent.c, "not-an-object");
 });
 
-test("applyDelegateModel sets defaultModel without mutating input", () => {
-  const config = { engine: "opencode", allowedAgents: ["general"] };
+test("applyModel only pins the agents it is given", () => {
+  const config = {
+    agent: {
+      a: { description: "factory agent" },
+      mine: { model: "x" }
+    }
+  };
+  const out = applyModel(config, "new/model", ["a"]);
+  assert.equal(out.agent.a.model, "new/model");
+  assert.equal(out.agent.mine.model, "x");
+});
+
+test("applyModel leaves the config untouched without a model", () => {
+  const config = { agent: { a: { description: "no model here" } } };
+  assert.equal(applyModel(config, null), config);
+  assert.equal(applyModel(config, ""), config);
+  assert.equal("model" in config.agent.a, false);
+});
+
+test("applyDelegateModel pins the model on every agent without mutating input", () => {
+  const config = {
+    engine: "opencode",
+    agents: {
+      general: { allowCustom: true },
+      "senior-dev": { allowCustom: false }
+    }
+  };
   const out = applyDelegateModel(config, "m/x");
   assert.equal(out.defaultModel, "m/x");
+  assert.equal(out.agents.general.model, "m/x");
+  assert.equal(out.agents["senior-dev"].model, "m/x");
   assert.equal(config.defaultModel, undefined);
+  assert.equal(config.agents.general.model, undefined);
 });
 
 test("mergeGitignore appends only missing lines", () => {

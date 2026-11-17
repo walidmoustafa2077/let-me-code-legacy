@@ -78,7 +78,7 @@ let-me-code [init] [target-dir] [options]
       --no-install    skip npm install in mcp/delegation
       --no-test       skip the MCP test run
       --no-git        skip git init
-      --model <id>    model for dispatched agents
+      --model <id>    pin every factory agent to this model
   -h, --help          usage
   -v, --version       print version
 ```
@@ -127,6 +127,11 @@ otherwise `allowedAgents` is used. Passing a `model` to `delegate_task` is
 rejected unless the agent (or `allowCustomModel`) allows it. On an
 *unknown-model* error the job retries the same message against the next
 candidate model, so a stale provider name degrades instead of failing.
+
+`let-me-code init --model <id>` writes the id as `defaultModel` and as each agent's
+`model` in `DELEGATE_CONFIG.json`, and sets `model` on every factory agent in
+`opencode.json`. Without `--model` nothing is pinned, so every agent inherits the
+default model of the opencode session it runs in.
 
 Timeouts are set in the same file:
 
